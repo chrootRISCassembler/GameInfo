@@ -24,15 +24,15 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class Game {
-    protected UUID uuid;
-    protected Path exe;
-    protected String name;
-    protected Instant lastMod;
-    protected String desc;
-    protected Path panel;
-    protected List<Path> imageList = Collections.emptyList();
-    protected List<Path> movieList = Collections.emptyList();
-    protected int gameID = 0;
+    UUID uuid;
+    Path exe;
+    String name;
+    Instant lastMod;
+    String desc;
+    Path panel;
+    List<Path> imageList = Collections.emptyList();
+    List<Path> movieList = Collections.emptyList();
+    int gameID = 0;
 
     public UUID getUUID() {
         return uuid;
