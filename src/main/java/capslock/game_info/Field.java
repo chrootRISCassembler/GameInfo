@@ -16,12 +16,7 @@
 package capslock.game_info;
 
 public enum Field {
-    UUID{
-        @Override
-        public String toString() {
-            return "uuid";
-        }
-    },
+    UUID,
     EXE{
         @Override
         public String toString() {
