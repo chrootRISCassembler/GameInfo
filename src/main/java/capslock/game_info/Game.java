@@ -162,6 +162,7 @@ public abstract class Game {
         boolean isUUIDOutExplicitly = false;
 
         for(final var field : Field.values()){
+            if(!jsonObject.has(field.toString()))continue;
             try {
                 if (jsonObject.getBoolean(field.toString())) {
                     fieldEnumSet.add(field);
