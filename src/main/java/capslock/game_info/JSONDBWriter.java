@@ -30,6 +30,8 @@ public final class JSONDBWriter {
     private final JSONArray gameList = new JSONArray();
     private final Path filePath;
 
+    public JSONDBWriter(){filePath = null;}
+
     /**
      * 書き込み先ファイルパスを指定してインスタンスを作る.
      * <strong>このコンストラクタはバージョン3.0.0で削除される.</strong>

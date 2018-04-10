@@ -15,11 +15,12 @@
 
 package capslock.game_info;
 
-import methg.commonlib.file_checker.FileChecker;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,12 +54,6 @@ public final class GameDocument extends Game {
             ex.printStackTrace();
         }
 
-//        if(uuid == null){
-//            uuid = UUID.randomUUID();
-//            System.err.println("UUID isn't set.");
-//            System.err.println("");
-//        }
-
         ExeField: try {
             final String uncheckedString = document.getString("exe");
             if(uncheckedString.isEmpty()){
@@ -66,16 +61,7 @@ public final class GameDocument extends Game {
                 break ExeField;
             }
 
-            exe = new FileChecker(uncheckedString)
-                    .onNotExists(file -> {
-                        System.err.println("Warning : exe file isn't found.");
-                        return true;
-                    })
-                    .onCanExec(dummy -> true)
-                    .onCannotRead(file -> true)
-                    .onCannotWrite(dummy -> true)
-                    .check()
-                    .get();
+            exe = Paths.get(uncheckedString);
 
         }catch (JSONException ex){
             if(document.has("exe")) {
@@ -84,6 +70,8 @@ public final class GameDocument extends Game {
                 System.err.println("There is no \"exe\" key. \"exe\" field is necessary.");
             }
             ex.printStackTrace();
+        }catch (InvalidPathException ex){
+            System.err.println("Wrong value is set in exe. This is not a Path.");
         }
 
         try {
@@ -114,41 +102,24 @@ public final class GameDocument extends Game {
         }
 
         try {
-            panel = new FileChecker(document.getString("panel"))
-                    .onNotExists(dummy -> {
-                        System.err.println("Warning : panel file isn't found.");
-                        return true;
-                    })
-                    .onCanExec(dummy -> {
-                        //余計なパーミッションの警告
-                        return true;
-                    })
-                    .onCannotWrite(dummy -> true)
-                    .check()
-                    .get();
-
+            panel = Paths.get(document.getString(Field.PANEL.toString()));
         }catch (JSONException ex){
             if(document.has("panel")) {
                 System.err.println("There is \"panel\" key, but wrong value.");
                 ex.printStackTrace();
             }
+        } catch (InvalidPathException ex){
+            System.err.println("Wrong value is set in panel. This is not a Path.");
         }
 
         if(document.has("imageList")){
             imageList = new ArrayList<>();
             for (final Object unchecked : document.getJSONArray("imageList")){
-                new FileChecker((String)unchecked)
-                        .onNotExists(dummy -> {
-                            System.err.println("Warning : image file isn't found.");
-                            return true;
-                        })
-                        .onCanExec(dummy -> {
-                            //余計なパーミッションの警告
-                            return true;
-                        })
-                        .onCannotWrite(dummy -> true)
-                        .check()
-                        .ifPresent(path -> imageList.add(path));
+                try {
+                    imageList.add(Paths.get((String)unchecked));
+                }catch (InvalidPathException ex){
+                    System.err.println("Wrong value is set in imageList. This is not a Path.");
+                }
             }
         }
 
@@ -156,18 +127,11 @@ public final class GameDocument extends Game {
         if(document.has("movieList")){
             movieList = new ArrayList<>();
             for (final Object unchecked : document.getJSONArray("movieList")){
-                new FileChecker((String)unchecked)
-                        .onNotExists(dummy -> {
-                            System.err.println("Warning : movie file isn't found.");
-                            return true;
-                        })
-                        .onCanExec(dummy -> {
-                            //余計なパーミッションの警告
-                            return true;
-                        })
-                        .onCannotWrite(dummy -> true)
-                        .check()
-                        .ifPresent(path -> movieList.add(path));
+                try {
+                    movieList.add(Paths.get((String)unchecked));
+                }catch (InvalidPathException ex){
+                    System.err.println("Wrong value is set in movieList. This is not a Path.");
+                }
             }
         }
 
