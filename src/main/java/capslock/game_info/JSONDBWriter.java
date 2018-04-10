@@ -15,7 +15,6 @@
 
 package capslock.game_info;
 
-import methg.commonlib.file_checker.FileChecker;
 import org.json.JSONArray;
 
 import java.io.BufferedWriter;
@@ -33,15 +32,14 @@ public final class JSONDBWriter {
 
     /**
      * 書き込み先ファイルパスを指定してインスタンスを作る.
+     * <strong>このコンストラクタはバージョン3.0.0で削除される.</strong>
      * @throws IllegalArgumentException 引数のファイルが書き込み用に開けないとき
      */
+    @Deprecated
     public JSONDBWriter(Path filePath) throws IllegalArgumentException {
-        this.filePath = new FileChecker(filePath)
-                .onNotExists(dummy -> true)
-                .onCannotRead(dummy -> true)
-                .onCanExec(dummy -> true)
-                .check()
-                .orElseThrow(IllegalArgumentException::new);
+        if(!Files.isWritable(filePath))throw new IllegalArgumentException();
+
+        this.filePath = filePath;
     }
 
     /**
@@ -55,9 +53,26 @@ public final class JSONDBWriter {
 
     /**
      * {@link #add(Game)}で追加した全てのゲーム情報をファイルに書き込む.
+     * <strong>このメソッドはバージョン3.0.0で削除される.</strong>
      * @throws IOException ファイル書き込み中にエラーが発生した.
      */
+    @Deprecated
     public final void flush() throws IOException{
+        try(final BufferedWriter writer = Files.newBufferedWriter(filePath,
+                StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)){
+            gameList.write(writer);
+        } catch (IOException ex) {
+            System.err.println("Failed to write on " + filePath);
+            throw ex;
+        }
+    }
+
+    /**
+     * ゲームの登録情報をJSONファイルに書き出す.
+     * @param filePath 情報を書き出すJSONファイルのパス
+     * @throws IOException ファイル書き込みに失敗した.
+     */
+    public final void flush(Path filePath) throws IOException {
         try(final BufferedWriter writer = Files.newBufferedWriter(filePath,
                 StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)){
             gameList.write(writer);
