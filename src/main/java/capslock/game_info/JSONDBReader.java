@@ -15,7 +15,6 @@
 
 package capslock.game_info;
 
-import methg.commonlib.file_checker.FileChecker;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -39,31 +38,21 @@ public final class JSONDBReader {
      * @throws IOException ファイル読み込み中にエラーが発生した
      */
     public JSONDBReader(Path filePath) throws IllegalArgumentException, IOException {
-        final String JSONRawString = Files.newBufferedReader
-                (
-                        new FileChecker(filePath)
-                        .onCannotWrite(dummy -> true)
-                        .onCanExec(dummy -> true)
-                        .check()
-                        .orElseThrow(IllegalArgumentException::new)
-                )
+        final String JSONRawString = Files.newBufferedReader(filePath)
                 .lines()
                 .collect(Collectors.joining());
 
         gameList = new ArrayList<>();
 
         for (Object unchecked : new JSONArray(JSONRawString)){
-            System.out.println(unchecked.getClass());
-            System.out.println(unchecked);
             if(unchecked instanceof JSONObject){
-                final GameDocument document = new GameDocument((JSONObject) unchecked);
-                gameList.add(document);
+                gameList.add(new GameDocument((JSONObject) unchecked));
             }
-            System.err.println();
         }
     }
 
     /**
+     * JSONファイルから読みだした{@link GameDocument}を返す.
      * {@link GameDocument}のリストを返す.
      */
     public final List<GameDocument> getDocumentList(){
